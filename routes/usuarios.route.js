@@ -6,17 +6,35 @@ const { usuariosGet,
         usuariosPut,
         usuariosDelete,
         usuariosPatch } = require('../controllers/usuarios.controller');
+
 const { esRolValido, emailValido, existeUsuarioPorId } = require('../helpers/db-validators');
-const { validarCampos } = require('../middlewares/validar-campos');
+
+// const { validarCampos } = require('../middlewares/validar-campos');
+// const { validarJWT } = require('../middlewares/validar-jwt');
+// const { esAdminRole , tieneRole } = require('../middlewares/validar-roles');
+const { validarCampos, 
+        validarJWT, 
+        esAdminRole, 
+        tieneRole} = require('../middlewares'); //Al dejarlo así me toma el archivo index por defecto
 
 const router = Router();
 
 // Distribución:
 // En el primer elemento tenemos la ruta, en la segundo el middleware y en la tercera la acción
+// Todas las peticiones las validaré con su JWT
 
-router.get('/',  usuariosGet); //No ejecutamos de forma directa, mandamos una referencia a la misma
+router.get('/', [
+    //Tenemos que validar el token, entonces:
+    validarJWT,
+    //Después de validar el JWT, nosotros en la request capturamos el usuario logeado, entonces:
+    tieneRole('ADMIN_ROL' , 'VENTAS_ROL', 'USER_ROL'),
+], usuariosGet); //No ejecutamos de forma directa, mandamos una referencia a la misma
 
 router.put('/:myId', [
+    //Tenemos que validar el token, entonces:
+    validarJWT,
+    //Después de validar el JWT, nosotros en la request capturamos el usuario logeado, entonces:
+    tieneRole('ADMIN_ROL' , 'VENTAS_ROL'),
     //Debemos verificar primeramente el ID, este debe ser válido
     check('myId', 'EL ID proporcionado NO es un ID válido de Mongo').isMongoId(),
     check('myId').custom( (myId) => existeUsuarioPorId(myId) ),
@@ -26,6 +44,10 @@ router.put('/:myId', [
 
 //Como podemos tener varias validaciones con el check (De express validator), entonces usamos un arreglo []
 router.post('/', [
+    //Tenemos que validar el token, entonces:
+    validarJWT,
+    //Después de validar el JWT, nosotros en la request capturamos el usuario logeado, entonces:
+    tieneRole('ADMIN_ROL' , 'VENTAS_ROL'),
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('nombre', 'El nombre debe ser texto').not().isNumeric(),
     check('celular', 'El celular es obligatorio').not().isEmpty(),
@@ -40,6 +62,11 @@ router.post('/', [
 ], usuariosPost); //No ejecutamos de forma directa, mandamos una referencia a la misma
 
 router.delete('/:myId', [
+    //Tenemos que validar el token, entonces:
+    validarJWT,
+    //Después de validar el JWT, nosotros en la request capturamos el usuario logeado, entonces:
+    // esAdminRole,
+    tieneRole('ADMIN_ROL' , 'VENTAS_ROL'),
     //Debemos verificar primeramente el ID, este debe ser válido
     check('myId', 'EL ID proporcionado NO es un ID válido de Mongo').isMongoId(),
     check('myId').custom( (myId) => existeUsuarioPorId(myId) ),

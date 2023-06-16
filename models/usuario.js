@@ -56,7 +56,8 @@ const UsuarioSchema = Schema({
 UsuarioSchema.methods.toJSON = function() {
     //Sacamos la versión, el id y el password, y todos los demás
     //los dejo almacenamos en elResto.
-    const { __v , _id, password, ...elResto } = this.toObject(); //Para generar la instancia como si fuera un objeto literal de JS
+    const { __v , _id, password, ...elResto } = this.toObject(); //Generar la instancia como si fuera un objeto literal de JS
+    elResto.uid = _id; //Renombramos
     return elResto;
 }
 

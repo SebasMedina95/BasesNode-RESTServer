@@ -9,6 +9,7 @@ class Server {
         this.app = express(); //Creamos en el servidor la aplicación de Express
         this.myPort = process.env.PORT;
         this.usuariosRoutePath = '/api/usuarios';
+        this.authRoutePath = '/api/auth';
 
         //Conectarnos a la base de datos Mongo
         this.conectarDB();
@@ -26,6 +27,7 @@ class Server {
 
     routes(){
         //Es una especie de Middleware implícito
+        this.app.use(this.authRoutePath, require('../routes/auth.route'));
         this.app.use(this.usuariosRoutePath, require('../routes/usuarios.route'));
 
     }

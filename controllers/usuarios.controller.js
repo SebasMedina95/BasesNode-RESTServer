@@ -33,9 +33,13 @@ const usuariosGet = async(req = request, res = response) => {
     ]);
 
     const totalMostrado = usuariosFiltrados.length;
+
+    //Obtengo el usuario autenticado
+    const usuarioAutenticado = req.usuarioLogeado;
     
     res.json({
         msg : 'get API - Desde el Controlador',
+        usuarioAutenticado,
         totalColeccion : total,
         totalMostrado : totalMostrado,
         usuariosFiltrados
@@ -52,13 +56,16 @@ const usuariosPut = async(req, res) => {
     //Extraemos también el _id para evitar errores por el Object ID de Mongo
     const { _id, password, google, correo, ...restoInfo } = req.body;
 
-    //TODO: Validar contra BD.
     //Quiere actualizar la contraseña
     if(password){
         //Encriptar contraseña
         const salt = bcryptjs.genSaltSync();
         restoInfo.password = bcryptjs.hashSync( password , salt );
     }
+
+    //Obtengo el usuario autenticado
+    const usuarioAutenticado = req.usuarioLogeado;
+
     //Lo que hacemos es findByIdAndUpdate para que busque por el ID y que lo actualice con el restoInfo
     //debemos colocar el {new: true} para forzar a que actualice y devuelva la infor actualizada.
     const usuarioDB = await Usuario.findByIdAndUpdate( myId, restoInfo, {new: true})
@@ -66,7 +73,8 @@ const usuariosPut = async(req, res) => {
     res.json({
         msg : 'put API - Desde el controlador',
         idEdit : myId,
-        usuarioEdit : usuarioDB
+        usuarioEdit : usuarioDB,
+        usuarioAutenticado
     });
 
 }
@@ -85,6 +93,9 @@ const usuariosPost = async(req, res) => {
     const salt = bcryptjs.genSaltSync();
     usuarioInstancia.password = bcryptjs.hashSync( password , salt );
 
+    //Obtengo el usuario autenticado
+    const usuarioAutenticado = req.usuarioLogeado;
+
     //Ordeno a mongoose que me guarde la instancia de usuarioInstancia
     //puedo colocar el await para que espere que haga la inserción.
     await usuarioInstancia.save();
@@ -92,7 +103,8 @@ const usuariosPost = async(req, res) => {
     res.json({
         msg : 'post API - Desde el controlador',
         myBody : body,
-        result: usuarioInstancia
+        result: usuarioInstancia,
+        usuarioAutenticado
     });
 
 }
@@ -102,16 +114,23 @@ const usuariosDelete = async(req, res) => {
     //Viene en los params, y seleccionamos el nombre que le dimos en la ruta '/:myId',  usuariosDelete
     const { myId } = req.params;
 
+    //Extraigo el uid que viene de la req, dentro del token al ser validado
+    //Extraigo el usuario que pertenece al id que viene el toquen, al uid
+    //const uid = req.uid;
+    const usuarioAutenticado = req.usuarioLogeado;
+
     //Borrado "físico"
     // const usuarioDel = await Usuario.findByIdAndDelete(myId);
+
+    //Solo podemos eliminar si se tiene rol de administrador
 
     //Borrado "lógico"
     const usuarioDel = await Usuario.findByIdAndUpdate(myId , {estado : false} , {new: true});
 
     res.json({
         msg : 'delete API - Desde el controlador',
-        idElim : myId,
-        eliminado : usuarioDel
+        usuarioLogeado : usuarioAutenticado,
+        usuarioEliminado : usuarioDel
     });
 
 }
