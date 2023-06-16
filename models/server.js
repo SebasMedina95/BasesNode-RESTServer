@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require("path"); //Para no tener problemas con el index
 const cors = require('cors'); //Para configurar quien puede acceder a mi api REST
+const { dbConnection } = require('../database/config.db');
 
 class Server {
 
@@ -9,11 +10,18 @@ class Server {
         this.myPort = process.env.PORT;
         this.usuariosRoutePath = '/api/usuarios';
 
+        //Conectarnos a la base de datos Mongo
+        this.conectarDB();
+
         //Middlewares (Funciones que añaden mas funcionalidades)
         this.middlewares();
 
         //Rutas de mi aplicación
         this.routes();
+    }
+
+    async conectarDB(){
+        await dbConnection();
     }
 
     routes(){
@@ -28,6 +36,7 @@ class Server {
         });
     }
 
+    //Función que se ejecuta antes de llamar al controlador en teoría o de continuar con la lógica
     middlewares(){
         //Use es como la "Palabra reservada" para el uso de los Middlewares
 
