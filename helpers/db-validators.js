@@ -1,6 +1,6 @@
 //Traigo el esquema para evaluar
 const Role = require('../models/role')
-const Usuario = require('../models/usuario');
+const {Usuario , Categoria, Producto} = require('../models');
 const mongoose = require('mongoose');
 
 //Validamos contra la base de datos,el custom me recibirá el valor a evaluar del body
@@ -33,15 +33,45 @@ const existeUsuarioPorId = async( id ) => {
         //D ser valido lo capturo para validar
         const existId = await Usuario.findById(id);
      if (!existId) {
-        throw new Error(`El id ${id} no existe en la BD Mongo`);
+        throw new Error(`El Usuario con ID ${id} no existe en la BD Mongo`);
         }
     }else{
-        throw new Error(`El id ${id} no es válido, no tiene la forma ID Mongo`);
+        throw new Error(`El Usuario con ID ${id} no es válido, no tiene la forma ID Mongo`);
     }
+}
+
+const existeCategoriaPorId = async( id ) => {
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        //D ser valido lo capturo para validar
+        const existId = await Categoria.findById(id);
+     if (!existId) {
+        throw new Error(`La Categoría con ID ${id} no existe en la BD Mongo`);
+        }
+    }else{
+        throw new Error(`La Categoría con ID ${id} no es válido, no tiene la forma ID Mongo`);
+    }
+
+}
+
+const existeProductoPorId = async( id ) => {
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        //D ser valido lo capturo para validar
+        const existId = await Producto.findById(id);
+     if (!existId) {
+        throw new Error(`El Producto con ID ${id} no existe en la BD Mongo`);
+        }
+    }else{
+        throw new Error(`El Producto con ID ${id} no es válido, no tiene la forma ID Mongo`);
+    }
+
 }
 
 module.exports = {
     esRolValido,
     emailValido,
-    existeUsuarioPorId
+    existeUsuarioPorId,
+    existeCategoriaPorId,
+    existeProductoPorId
 }
