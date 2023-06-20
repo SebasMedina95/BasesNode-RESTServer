@@ -2,14 +2,16 @@
 //buscará primeramente este archivo, actua como una especie de "archivo barril", aquí
 //vamos a contener todos los middlewares personalizados para llamarlos en un solo instante
 
-const validarCampos = require('../middlewares/validar-campos');
-const validarJWT = require('../middlewares/validar-jwt');
-const validarRoles = require('../middlewares/validar-roles');
+const validarCampos        = require('../middlewares/validar-campos');
+const validarJWT           = require('../middlewares/validar-jwt');
+const validarRoles         = require('../middlewares/validar-roles');
+const validarArchivoSubida = require('../middlewares/validar-archivo');
 
 //Utilizo el operador spred ... para que exporte todos los elementos asociados
 //de esta manera me evito tener que llamar uno a uno los métodos internos
 module.exports = {
     ...validarCampos,
     ...validarJWT,
-    ...validarRoles
+    ...validarRoles,
+    ...validarArchivoSubida
 }

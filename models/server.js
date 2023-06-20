@@ -2,6 +2,7 @@ const express = require('express');
 const path = require("path"); //Para no tener problemas con el index
 const cors = require('cors'); //Para configurar quien puede acceder a mi api REST
 const { dbConnection } = require('../database/config.db');
+const fileUpload = require('express-fileupload')
 
 class Server {
 
@@ -15,6 +16,7 @@ class Server {
             buscar : '/api/buscar',
             categorias: '/api/categorias',
             productos : '/api/productos',
+            subirArchivo : '/api/subirArchivo',
             usuarios : '/api/usuarios',
         }
 
@@ -36,11 +38,13 @@ class Server {
     }
 
     routes(){
+        
         //Es una especie de Middleware implícito
         this.app.use(this.paths.auth, require('../routes/auth.route'));
         this.app.use(this.paths.buscar, require('../routes/buscar.route'));
         this.app.use(this.paths.categorias, require('../routes/categorias.route'));
         this.app.use(this.paths.productos, require('../routes/productos.route'));
+        this.app.use(this.paths.subirArchivo, require('../routes/subidas.route'));
         this.app.use(this.paths.usuarios, require('../routes/usuarios.route'));
 
     }
@@ -64,6 +68,13 @@ class Server {
 
         //A continuación, el directorio público
         this.app.use( express.static('public') );
+
+        //Para manejar la subida de archivos (FileUpload)
+        this.app.use( fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/',
+            createParentPath: true
+        }));
     }
 
 }

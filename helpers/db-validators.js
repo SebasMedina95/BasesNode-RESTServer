@@ -68,10 +68,24 @@ const existeProductoPorId = async( id ) => {
 
 }
 
+const coleccionesPermitidas = async( coleccion = '' , colecciones = [] ) => {
+
+    const incluida = colecciones.includes( coleccion );
+
+    if( !incluida ){
+        throw new Error(`La colección ${coleccion} no es permitida, solo se permiten ${colecciones}`);
+    }
+
+    //En las anteriores no hubo necesidad porque, de alguna manera, implícita, ya estabamos mandando el true
+    return true;
+
+}
+
 module.exports = {
     esRolValido,
     emailValido,
     existeUsuarioPorId,
     existeCategoriaPorId,
-    existeProductoPorId
+    existeProductoPorId,
+    coleccionesPermitidas
 }
